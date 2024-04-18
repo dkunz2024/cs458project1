@@ -6,3 +6,6 @@ dataset <- select(dataAll, fuelCost08, make, model, trany, UCity, UHighway, year
 dataset <- rename(dataset, fuelCost=fuelCost08, transmission=trany, cityMPG=UCity, hwyMPG=UHighway)
 
 plot(dataset$fuelCost)
+
+as.factor(dataset$make)
+as.factor(dataset$model)
