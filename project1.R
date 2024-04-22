@@ -72,6 +72,7 @@ cityMPG_by_make <- dataset %>%
 #data, mapping, geometry
 #color, shape, size
 
+#Vehicle MPG and fuel cost by year
 dataset %>% 
   select(fuelCost, cityMPG, year) %>% 
   filter(fuelCost>0) %>% 
@@ -87,29 +88,35 @@ dataset %>%
 transmission_count <- dataset %>%
   group_by(transmission) %>%
   summarise(count = n()) %>%
-  top_n(n = 5, wt = count)
-top5transmissions = as.vector(transmission_count[,1])
-class(top5transmissions)
+  top_n(n = 6, wt = count)
+toptransmissions = as.vector(transmission_count[,1])
+class(toptransmissions)
 
+#Vehicle MPG and fuel cost by year and transmission type
 dataset %>% 
-  select(fuelCost, cityMPG) %>% 
+  select(fuelCost, cityMPG, year, transmission) %>% 
   filter(fuelCost>0) %>% 
   filter(cityMPG>0) %>% 
-  ggplot(mapping = aes(x=cityMPG)) + 
-  geom_boxplot() +
-  theme_minimal()
+  filter(transmission %in% c("Automatic (S6)", "Automatic (S8)", "Automatic 3-spd", "Automatic 4-spd", "Manual 5-spd", "Manual 6-spd")) %>% 
+  ggplot(mapping = aes(x=fuelCost, y=cityMPG, color=year)) + 
+  geom_point() +
+  facet_wrap(~transmission) +
+  theme_minimal() +
+  labs(title = "Vehicle MPG and Fuel Cost by Year and Transmission Type",
+       x = "Fuel Cost",
+       y = "City MPG")
 
-dataset %>% 
-  mutate(top5 = if_else(as.character(transmission) == c("Automatic (A1)"), 1, 0)) %>% 
-  filter(top5 == 1) %>% 
-  view()
+# dataset %>% 
+#   mutate(top5 = if_else(as.character(transmission) == c("Automatic (A1)"), 1, 0)) %>% 
+#   filter(top5 == 1) %>% 
+#   view()
+# 
+# dataset %>% 
+#   mutate(top5 = if_else(as.integer(transmission) %in% top5transmissions, 1, 0)) %>% 
+#   filter(top5 == 1) %>% 
+#   view()
 
-dataset %>% 
-  mutate(top5 = if_else(as.integer(transmission) %in% top5transmissions, 1, 0)) %>% 
-  filter(top5 == 1) %>% 
-  view()
-
-dataset[top5transmissions]
+#dataset[top5transmissions]
 
 
 
