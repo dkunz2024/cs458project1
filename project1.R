@@ -31,11 +31,13 @@ missing.df <- dataset[missing,]
 dataset$make <- as.factor(dataset$make)
 dataset$model <- as.factor(dataset$model)
 dataset$transmission <- as.factor(dataset$transmission)
+#dataset$year <- as.factor(dataset$year)
 
 ##Other useful functions?
 #levels(dataset$make)
 #dataset %>% 
 #  filter(hwyMPG > 50)
+#  filter(order %in% c(...,...))
 #mutate()?
 #mean(dataset$hwyMPG, na.rm=T)
 #distinct(dataset) #remove duplicates
@@ -63,6 +65,54 @@ cityMPG_by_make <- dataset %>%
     'Average' = mean(cityMPG),
     'Upper' = max(cityMPG),
     'Difference' = max(cityMPG)-min(cityMPG))
+
+##################
+# VISUALIZATION  #
+##################
+#data, mapping, geometry
+#color, shape, size
+
+dataset %>% 
+  select(fuelCost, cityMPG, year) %>% 
+  filter(fuelCost>0) %>% 
+  filter(cityMPG>0) %>% 
+  ggplot(mapping = aes(x=fuelCost, y=cityMPG, color=year)) + 
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Vehicle MPG and fuel cost by year",
+      x = "Fuel Cost",
+      y = "City MPG")
+
+#get the top 5 transmissions by count
+transmission_count <- dataset %>%
+  group_by(transmission) %>%
+  summarise(count = n()) %>%
+  top_n(n = 5, wt = count)
+top5transmissions = as.vector(transmission_count[,1])
+class(top5transmissions)
+
+dataset %>% 
+  select(fuelCost, cityMPG) %>% 
+  filter(fuelCost>0) %>% 
+  filter(cityMPG>0) %>% 
+  ggplot(mapping = aes(x=cityMPG)) + 
+  geom_boxplot() +
+  theme_minimal()
+
+dataset %>% 
+  mutate(top5 = if_else(as.character(transmission) == c("Automatic (A1)"), 1, 0)) %>% 
+  filter(top5 == 1) %>% 
+  view()
+
+dataset %>% 
+  mutate(top5 = if_else(as.integer(transmission) %in% top5transmissions, 1, 0)) %>% 
+  filter(top5 == 1) %>% 
+  view()
+
+dataset[top5transmissions]
+
+
+
 
 
 
